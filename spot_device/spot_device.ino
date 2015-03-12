@@ -52,8 +52,12 @@ void loop() {
     }
     if(inByte == dev[FAN].onInst)  digitalWrite(dev[FAN].pin, HIGH);
     if(inByte == dev[FAN].offInst) digitalWrite(dev[FAN].pin, LOW);
-    if(inByte == dev[PUMP].onInst)  digitalWrite(dev[PUMP].pin, HIGH);
-    if(inByte == dev[PUMP].offInst) digitalWrite(dev[PUMP].pin, LOW);
+    if(inByte == dev[PUMP].onInst)
+    {
+      digitalWrite(dev[PUMP].pin, HIGH);
+      delay(1000);
+      digitalWrite(dev[PUMP].pin, LOW);
+    }
     if(inByte == dev[HEATER].onInst)  digitalWrite(dev[HEATER].pin, HIGH);
     if(inByte == dev[HEATER].offInst) digitalWrite(dev[HEATER].pin, LOW);
   }
