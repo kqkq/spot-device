@@ -27,7 +27,13 @@ void setup() {
   pinMode(dev[PUMP].pin, OUTPUT);
   pinMode(dev[HEATER].pin, OUTPUT);
   pinMode(LIGHT_PIN, OUTPUT);
+  digitalWrite(dev[FAN].pin, LOW);
+  digitalWrite(dev[PUMP].pin, LOW);
+  digitalWrite(dev[HEATER].pin, LOW);
+  analogWriteFreq(1000);
+  analogWrite(LIGHT_PIN, 0);
   Serial.begin(9600);
+  while(!Serial);
 }
 
 void loop() {
