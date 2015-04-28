@@ -19,8 +19,14 @@ s_device dev[3] = {{13, 'A', 'a'},   //FAN
 int inByte = 0;
 int digits_read = 0;
 int brightness = 0;
+int lastBrightness = 0;
+int lastChange = 0;
+const int DIM_INTERVAL = 800;
 const int LIGHT_PIN = 11;
-
+long __map(long x, long in_min, long in_max, long out_min, long out_max)
+{
+      return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 void setup() {
   // put your setup code here, to run once:
   pinMode(dev[FAN].pin, OUTPUT);
@@ -37,22 +43,26 @@ void setup() {
 }
 
 void loop() {
+  static int tmp_brightness = 0;
   if(Serial.available() > 0)
   {
     inByte = Serial.read();
     if(inByte == 'L')
     {
       digits_read = 0;
-      brightness = 0;
+      tmp_brightness = 0;
     }
     if(inByte >= '0' && inByte <='9')
     {
-      brightness *= 10;
-      brightness += inByte - '0';
+      tmp_brightness *= 10;
+      tmp_brightness += inByte - '0';
       digits_read++;
       if(digits_read == 3)
       {
-        analogWrite(LIGHT_PIN, brightness);
+        lastBrightness = brightness;
+        lastChange = millis();
+        brightness = tmp_brightness;
+        //analogWrite(LIGHT_PIN, brightness);
         //Serial.println(brightness);
       }
     }
@@ -67,4 +77,11 @@ void loop() {
     if(inByte == dev[HEATER].onInst)  digitalWrite(dev[HEATER].pin, HIGH);
     if(inByte == dev[HEATER].offInst) digitalWrite(dev[HEATER].pin, LOW);
   }
+  int remainDimming = millis() - lastChange;
+  if(remainDimming > DIM_INTERVAL)
+  {
+    remainDimming = DIM_INTERVAL;
+  }
+  int brightness_dim = __map(remainDimming, 0, DIM_INTERVAL, lastBrightness, brightness);
+  analogWrite(LIGHT_PIN, brightness_dim);
 }
